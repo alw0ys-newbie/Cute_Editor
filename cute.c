@@ -29,7 +29,12 @@ editorConfig EC;
 void die(const char* s)
 {
     write(STDOUT_FILENO, ERASE_SCREEN, 4);
-    write(STDOUT_FILENO, MOVE_CURSOR(1, 1), 6);
+    write(STDOUT_FILENO, "\x1b["
+                         "1"
+                         ";"
+                         "1"
+                         "f",
+        6);
     perror(s);
     exit(1);
 }
@@ -103,15 +108,24 @@ void editorProcessKeyPressed()
     switch (c) {
     case CTRL_KEY('q'):
         write(STDOUT_FILENO, ERASE_SCREEN, 4);
-        write(STDOUT_FILENO, MOVE_CURSOR(1, 1), 6);
+        write(STDOUT_FILENO, "\x1b["
+                             "1"
+                             ";"
+                             "1"
+                             "f",
+            6);
         exit(0);
         break;
     }
 }
 
+void setCursorSequence(char* escapeSequence, size_t sequenceSize, int row, int col)
+{
+    snprintf(escapeSequence, sequenceSize, "\x1b[%d;%df", row, col);
+}
 /*** output ***/
 
-void appendRows(textBuffer_t screenRows)
+void appendWelcomeScreen(textBuffer_t screenRows)
 {
     for (int i = 0; i < EC.rows; i++) {
         if (i == EC.rows / 3) {
@@ -119,6 +133,10 @@ void appendRows(textBuffer_t screenRows)
             int welcomeLen = snprintf(welcome, sizeof(welcome), "C.U.T.E -- version %s", VERSION);
             if (welcomeLen > EC.cols)
                 welcomeLen = EC.cols;
+            int welcomeOffset = ((EC.cols - welcomeLen) / 2) + 1;
+            char moveCursor[16];
+            setCursorSequence(moveCursor, sizeof(char[16]), i, welcomeOffset);
+            appendBuffer(screenRows, moveCursor);
             appendBuffer(screenRows, welcome);
         } else {
             appendBuffer(screenRows, "~");
@@ -135,7 +153,7 @@ void screenRefrech()
     textBuffer_t newScreen = initBuffer();
     appendBuffer(newScreen, HIDE_CURSOR);
     appendBuffer(newScreen, MOVE_CURSOR(1, 1));
-    appendRows(newScreen);
+    appendWelcomeScreen(newScreen);
     appendBuffer(newScreen, MOVE_CURSOR(1, 1));
     appendBuffer(newScreen, SHOW_CURSOR);
     write(STDOUT_FILENO, getBufferString(newScreen), getBufferLen(newScreen));
