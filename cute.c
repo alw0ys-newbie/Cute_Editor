@@ -14,6 +14,8 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define VERSION "0.0.1"
+#define ALTERNATIVE_SCREEN_BUFFER "\x1b[?1049h"
+#define CLOSE_SCREEN_BUFFER "\x1b[?1049l"
 #define ERASE_LINE_AFTER_CURSOR "\x1b[K"
 #define ERASE_SCREEN "\x1b[2J"
 #define HIDE_CURSOR "\x1b[?25l"
@@ -29,12 +31,7 @@ editorConfig EC;
 void die(const char* s)
 {
     write(STDOUT_FILENO, ERASE_SCREEN, 4);
-    write(STDOUT_FILENO, "\x1b["
-                         "1"
-                         ";"
-                         "1"
-                         "f",
-        6);
+    write(STDOUT_FILENO, "\x1b[1;1f", 6);
     perror(s);
     exit(1);
 }
@@ -48,12 +45,11 @@ void disableRawMode()
 
 void enableRawMode()
 {
-
     struct termios raw;
+
     if (tcgetattr(STDIN_FILENO, &EC.orig_termios) == -1) {
         die("tecgetattr");
     };
-    atexit(disableRawMode);
 
     raw = EC.orig_termios;
 
@@ -81,12 +77,19 @@ void getWindowSize(int* rows, int* cols)
     }
 }
 
-void editorInit()
+void editorClose()
 {
-    enableRawMode();
-    getWindowSize(&EC.rows, &EC.cols);
+    write(STDOUT_FILENO, CLOSE_SCREEN_BUFFER, 8);
+    disableRawMode();
 }
 
+void editorInit()
+{
+    write(STDOUT_FILENO, ALTERNATIVE_SCREEN_BUFFER, 8);
+    enableRawMode();
+    getWindowSize(&EC.rows, &EC.cols);
+    atexit(editorClose);
+}
 /*** Input ***/
 
 char editorReadKey()
@@ -107,13 +110,6 @@ void editorProcessKeyPressed()
     c = editorReadKey();
     switch (c) {
     case CTRL_KEY('q'):
-        write(STDOUT_FILENO, ERASE_SCREEN, 4);
-        write(STDOUT_FILENO, "\x1b["
-                             "1"
-                             ";"
-                             "1"
-                             "f",
-            6);
         exit(0);
         break;
     }
@@ -123,6 +119,7 @@ void setCursorSequence(char* escapeSequence, size_t sequenceSize, int row, int c
 {
     snprintf(escapeSequence, sequenceSize, "\x1b[%d;%df", row, col);
 }
+
 /*** output ***/
 
 void appendWelcomeScreen(textBuffer_t screenRows)
