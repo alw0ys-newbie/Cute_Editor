@@ -43,14 +43,14 @@ void die(const char* s)
     exit(1);
 }
 
-void disableRawMode()
+void disable_raw_mode()
 {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &EC.orig_termios) == -1) {
         die("tcsetattr");
     };
 }
 
-void enableRawMode()
+void enable_raw_mode()
 {
     struct termios raw;
 
@@ -72,36 +72,36 @@ void enableRawMode()
     };
 }
 
-void getWindowSize(int* rows, int* cols)
+void get_window_size(int* rows, int* cols)
 {
     struct winsize ws;
 
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
-        die("getWindowSize");
+        die("get_window_size");
     } else {
         *cols = ws.ws_col;
         *rows = ws.ws_row;
     }
 }
 
-void editorClose()
+void editor_close()
 {
     write(STDOUT_FILENO, CLOSE_SCREEN_BUFFER, 8);
-    disableRawMode();
+    disable_raw_mode();
 }
 
 void editor_init()
 {
     write(STDOUT_FILENO, ALTERNATIVE_SCREEN_BUFFER, 8);
-    enableRawMode();
-    getWindowSize(&EC.rows, &EC.cols);
+    enable_raw_mode();
+    get_window_size(&EC.rows, &EC.cols);
     EC.cursor_row = 1;
     EC.cursor_col = 1;
-    atexit(editorClose);
+    atexit(editor_close);
 }
 /*** Input ***/
 
-int editorReadKey()
+int read_key()
 {
     int nread;
     char c;
@@ -133,10 +133,10 @@ int editorReadKey()
     return c;
 }
 
-void editorProcessKeyPressed()
+void process_key_pressed()
 {
     int c;
-    c = editorReadKey();
+    c = read_key();
 
     switch (c) {
     case CTRL_KEY('q'):
@@ -204,7 +204,7 @@ void write_welcome_screen()
     write(STDOUT_FILENO, getBufferString(newScreen), getBufferLen(newScreen));
     destroyBuffer(newScreen);
 }
-void screenRefrech()
+void sceen_refresh()
 {
     write_welcome_screen();
     set_cursor_position(EC.cursor_row, EC.cursor_col);

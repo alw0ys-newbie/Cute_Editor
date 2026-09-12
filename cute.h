@@ -2,6 +2,6 @@
 #define FILE_CUTE
 
 void editor_init();
-void editorProcessKeyPressed();
-void screenRefrech();
+void process_key_pressed();
+void screen_refresh();
 #endif

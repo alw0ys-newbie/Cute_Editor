@@ -8,8 +8,8 @@ int main(void)
 {
     editor_init();
     while (1) {
-        screenRefrech();
-        editorProcessKeyPressed();
+        screen_refresh();
+        process_key_pressed();
     }
     return 0;
 }
