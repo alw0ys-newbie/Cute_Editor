@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
 /*** Text Buffer definition ***/
 
-/* struct containing a string and its length*/
 struct textBuffer {
     size_t len;
     char* string;
@@ -15,12 +15,11 @@ struct textBuffer {
 textBuffer_t initBuffer()
 {
     textBuffer_t buffer = malloc(sizeof(struct textBuffer));
-    buffer->string = (char*)malloc(1);
-
-    if (buffer->string == NULL) {
-        perror("malloc buffer string failed");
-        exit(EXIT_SUCCESS);
+    if (buffer == NULL) {
+        perror("malloc init_buffer() failed");
+        exit(EXIT_FAILURE);
     }
+    buffer->string = NULL;
     buffer->len = 0;
     return buffer;
 }
@@ -28,9 +27,7 @@ textBuffer_t initBuffer()
 void destroyBuffer(textBuffer_t tB)
 {
     free(tB->string);
-    tB->string = NULL;
     free(tB);
-    tB = NULL;
 }
 
 char* getBufferString(textBuffer_t tB)
@@ -46,24 +43,15 @@ size_t getBufferLen(textBuffer_t tB)
 void appendBuffer(textBuffer_t tB, char* string)
 {
     char* new = string;
-    size_t lenNew = strlen(new);
-    tB->len += lenNew;
-    tB->string = realloc(tB->string, tB->len);
+    size_t sizeNew = strlen(new) + 1;
+
+    tB->string = realloc(tB->string, tB->len + sizeNew);
 
     if (tB->string == NULL) {
-        perror("malloc tB string failed");
-        exit(EXIT_SUCCESS);
+        perror("realloc() append_buffer() failed");
+        exit(EXIT_FAILURE);
     }
-
-    strcat(tB->string, new);
+    void* dest = &(tB->string[tB->len]);
+    memcpy(dest, new, sizeNew);
+    tB->len += sizeNew - 1;
 }
-
-/*int main()
-{
-    textBuffer_t buff = initBuffer();
-    printf("len : %zu , string : %s\n", buff->len, buff->string);
-    appendBuffer(buff, "bonjour !");
-    printf("%zu\n", strlen("bonjour !"));
-    printf("len : %zu , string : %s\n", getBufferLen(buff), getBufferString(buff));
-    destroyBuffer(buff);
-}*/
