@@ -10,6 +10,8 @@
 typedef struct editorConfig {
     int rows;
     int cols;
+    int cursor_row;
+    int cursor_col;
     struct termios orig_termios;
 } editorConfig;
 
