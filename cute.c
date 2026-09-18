@@ -204,7 +204,7 @@ void write_welcome_screen()
     write(STDOUT_FILENO, getBufferString(newScreen), getBufferLen(newScreen));
     destroyBuffer(newScreen);
 }
-void sceen_refresh()
+void screen_refresh()
 {
     write_welcome_screen();
     set_cursor_position(EC.cursor_row, EC.cursor_col);
