@@ -1,15 +1,18 @@
-/*** includes ***/
 
 #include "cute.h"
+#include <stdio.h>
 
-/*** init ***/
-
-int main(void)
+int main(int argc, char** argv)
 {
     editor_init();
-    while (1) {
-        screen_refresh();
-        process_key_pressed();
+
+    if (argc == 1) {
+        while (1) {
+            screen_refresh();
+            process_key_pressed();
+        }
+    } else {
+        printf("%s\n", argv[1]);
     }
     return 0;
 }

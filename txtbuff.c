@@ -1,4 +1,4 @@
-#include "data.h"
+#include "txtbuff.h"
 
 #include <stdio.h>
 #include <stdlib.h>

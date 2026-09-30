@@ -1,7 +1,8 @@
 /*** includes ***/
 
 #include "cute.h"
-#include "data.h"
+#include "fmanip.h"
+#include "txtbuff.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -21,6 +22,16 @@
 #define HIDE_CURSOR "\x1b[?25l"
 #define SHOW_CURSOR "\x1b[?25h"
 #define MOVE_CURSOR(x, y) "\x1b[" #x ";" #y "f"
+
+/*** editorConfig ***/
+
+typedef struct editorConfig {
+    int rows;
+    int cols;
+    int cursor_row;
+    int cursor_col;
+    struct termios orig_termios;
+} editorConfig;
 
 /*** Global Variables */
 
@@ -99,6 +110,7 @@ void editor_init()
     EC.cursor_col = 1;
     atexit(editor_close);
 }
+
 /*** Input ***/
 
 int read_key()
@@ -204,6 +216,7 @@ void write_welcome_screen()
     write(STDOUT_FILENO, getBufferString(newScreen), getBufferLen(newScreen));
     destroyBuffer(newScreen);
 }
+
 void screen_refresh()
 {
     write_welcome_screen();

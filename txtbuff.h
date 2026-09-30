@@ -1,19 +1,8 @@
-#ifndef DATA
-#define DATA
+#ifndef TXTBUFF
+#define TXTBUFF
 
 #include <stdlib.h>
 #include <termios.h>
-
-/*** editorConfig ***/
-
-/* Describes the actual configuration of the editor*/
-typedef struct editorConfig {
-    int rows;
-    int cols;
-    int cursor_row;
-    int cursor_col;
-    struct termios orig_termios;
-} editorConfig;
 
 /*** textBuffer***/
 
