@@ -4,9 +4,8 @@
 
 int main(int argc, char** argv)
 {
-    editor_init();
-
     if (argc == 1) {
+        editor_init();
         while (1) {
             screen_refresh();
             process_key_pressed();

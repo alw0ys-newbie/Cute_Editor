@@ -7,5 +7,6 @@ struct flines {
     char** linesList;
 };
 
-struct flines parse_file(char* fpath, int lineLength);
+int parse_file(char* fpath, int lineLength, struct flines* flines_t);
+int free_flines(struct flines* flines_t);
 #endif
